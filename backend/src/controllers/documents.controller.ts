@@ -64,6 +64,10 @@ export class DocumentsController {
 
   @Post(':id/upload-url')
   async uploadUrl(@Req() req: { user: { id: string } }, @Param('id') id: string) {
+    const document = await this.documents.getDocumentForOwner(id, req.user.id);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
     const objectKey = this.storage.buildObjectKey(req.user.id, id);
     const url = await this.storage.getPresignedPutUrl(objectKey);
     return { objectKey, url };
