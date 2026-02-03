@@ -6,14 +6,12 @@ import '../models/document.dart';
 import '../utils/date_utils.dart';
 
 class NotificationService {
-  static bool _timezonesReady = false;
+  static Future<void>? _initFuture;
   final _plugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    if (!_timezonesReady) {
-      tz.initializeTimeZones();
-      _timezonesReady = true;
-    }
+    _initFuture ??= Future<void>(() => tz.initializeTimeZones());
+    await _initFuture;
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
     const settings = InitializationSettings(android: android, iOS: ios);

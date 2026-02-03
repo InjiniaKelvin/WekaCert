@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/preferences_service.dart';
 import '../services/service_locator.dart';
+import '../utils/constants.dart';
 
 class PinScreen extends StatefulWidget {
   const PinScreen({super.key});
@@ -59,8 +60,10 @@ class _PinScreenState extends State<PinScreen> {
 
   Future<void> _attemptUnlock() async {
     final pin = _pinController.text.trim();
-    if (pin.length < 4) {
-      setState(() => _error = 'PIN must be at least 4 digits.');
+    if (pin.length < pinLength) {
+      if (mounted) {
+        setState(() => _error = 'PIN must be at least $pinLength digits.');
+      }
       return;
     }
     final success = await _auth.verifyPin(pin);

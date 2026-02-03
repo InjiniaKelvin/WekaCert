@@ -101,7 +101,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: controller,
           keyboardType: TextInputType.number,
           obscureText: true,
-          decoration: const InputDecoration(hintText: 'Enter PIN (4+ digits)'),
+          decoration: InputDecoration(
+            hintText: 'Enter PIN (${pinLength}+ digits)',
+          ),
         ),
         actions: [
           TextButton(
@@ -110,9 +112,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TextButton(
             onPressed: () {
-              if (controller.text.length < 4) {
+              if (controller.text.length < pinLength) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('PIN must be 4+ digits.')),
+                  SnackBar(
+                    content: Text('PIN must be $pinLength+ digits.'),
+                  ),
                 );
                 return;
               }

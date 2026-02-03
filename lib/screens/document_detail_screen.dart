@@ -80,16 +80,15 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                   const SizedBox(height: 16),
                   const Text('Version History'),
                   const SizedBox(height: 8),
-                  ...data.versions.map(
-                    (version) => Card(
+                  for (var index = 0; index < data.versions.length; index++)
+                    Card(
                       child: ListTile(
-                        title: Text('Version ${version.id.substring(0, 6)}'),
+                        title: Text('Version ${index + 1}'),
                         subtitle: Text(
-                          version.note ?? 'No notes added yet.',
+                          data.versions[index].note ?? 'No notes added yet.',
                         ),
                       ),
                     ),
-                  ),
                 ],
               );
             },

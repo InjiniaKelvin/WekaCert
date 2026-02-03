@@ -9,3 +9,5 @@ const documentCategories = [
 ];
 
 const reminderDayOptions = [3, 7, 14, 30];
+
+const pinLength = 4;
