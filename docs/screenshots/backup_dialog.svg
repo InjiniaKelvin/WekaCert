@@ -3,7 +3,7 @@
   <rect x="80" y="300" width="560" height="360" rx="20" fill="#FFFFFF" />
   <text x="140" y="360" font-size="20" fill="#222222" font-family="Arial, sans-serif">Cloud Backup</text>
   <text x="140" y="420" font-size="16" fill="#666666" font-family="Arial, sans-serif">Backups are encrypted before upload.</text>
-  <text x="140" y="450" font-size="16" fill="#666666" font-family="Arial, sans-serif">Sign-in will be enabled in the next step.</text>
+  <text x="140" y="450" font-size="16" fill="#666666" font-family="Arial, sans-serif">Sign-in is pending; enabled after setup.</text>
   <rect x="140" y="520" width="160" height="50" rx="25" fill="#2E7D32" />
   <text x="200" y="552" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">OK</text>
 </svg>
