@@ -83,7 +83,9 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                   for (var index = 0; index < data.versions.length; index++)
                     Card(
                       child: ListTile(
-                        title: Text('Version ${index + 1}'),
+                        title: Text(
+                          'Version ${data.versions.length - index}',
+                        ),
                         subtitle: Text(
                           data.versions[index].note ?? 'No notes added yet.',
                         ),
