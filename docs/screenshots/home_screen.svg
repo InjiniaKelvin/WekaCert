@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+  <rect width="720" height="1280" fill="#F5F5F5" />
+  <rect width="720" height="96" fill="#1B5E20" />
+  <text x="32" y="60" font-size="28" fill="#FFFFFF" font-family="Arial, sans-serif">WekaCert</text>
+  <rect x="32" y="140" width="656" height="90" rx="12" fill="#FFFFFF" />
+  <text x="52" y="196" font-size="20" fill="#333333" font-family="Arial, sans-serif">
+    Securely store your documents and track expiries.
+  </text>
+  <rect x="32" y="280" width="656" height="68" rx="34" fill="#2E7D32" />
+  <text x="260" y="325" font-size="20" fill="#FFFFFF" font-family="Arial, sans-serif">View Documents</text>
+  <rect x="32" y="370" width="656" height="68" rx="34" fill="#2E7D32" />
+  <text x="260" y="415" font-size="20" fill="#FFFFFF" font-family="Arial, sans-serif">Upload Document</text>
+  <rect x="32" y="460" width="656" height="68" rx="34" fill="#FFFFFF" stroke="#2E7D32" stroke-width="2" />
+  <text x="310" y="505" font-size="20" fill="#2E7D32" font-family="Arial, sans-serif">Settings</text>
+</svg>
