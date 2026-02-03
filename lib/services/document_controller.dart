@@ -64,6 +64,7 @@ class DocumentController {
       documentId: document.id,
       filePath: filePath,
       createdAt: now,
+      updatedAt: now,
       note: note,
     );
     await _repository.addDocument(document, version);
@@ -81,6 +82,7 @@ class DocumentController {
       documentId: document.id,
       filePath: filePath,
       createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
       note: note,
     );
     await _repository.addVersion(version);

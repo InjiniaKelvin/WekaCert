@@ -47,6 +47,7 @@ class DatabaseService {
             documentId TEXT NOT NULL,
             filePath TEXT NOT NULL,
             createdAt TEXT NOT NULL,
+            updatedAt TEXT,
             note TEXT,
             FOREIGN KEY(documentId) REFERENCES documents(id)
           )

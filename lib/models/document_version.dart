@@ -4,6 +4,7 @@ class DocumentVersion {
     required this.documentId,
     required this.filePath,
     required this.createdAt,
+    this.updatedAt,
     this.note,
   });
 
@@ -11,6 +12,7 @@ class DocumentVersion {
   final String documentId;
   final String filePath;
   final DateTime createdAt;
+  final DateTime? updatedAt;
   final String? note;
 
   Map<String, Object?> toMap() {
@@ -19,6 +21,7 @@ class DocumentVersion {
       'documentId': documentId,
       'filePath': filePath,
       'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
       'note': note,
     };
   }
@@ -29,6 +32,9 @@ class DocumentVersion {
       documentId: map['documentId'] as String,
       filePath: map['filePath'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),
+      updatedAt: map['updatedAt'] == null
+          ? null
+          : DateTime.parse(map['updatedAt'] as String),
       note: map['note'] as String?,
     );
   }

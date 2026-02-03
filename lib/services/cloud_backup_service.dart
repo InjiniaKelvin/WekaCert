@@ -6,7 +6,6 @@ import 'package:encrypt/encrypt.dart';
 
 import '../models/backup_record.dart';
 import '../models/document_version.dart';
-import '../utils/date_utils.dart';
 
 class CloudBackupService {
   CloudBackupService({required String encryptionKey})
@@ -57,7 +56,4 @@ class CloudBackupService {
     return digest.bytes;
   }
 
-  String buildBackupLabel(DateTime timestamp) {
-    return 'Backup ${formatDate(timestamp)}';
-  }
 }

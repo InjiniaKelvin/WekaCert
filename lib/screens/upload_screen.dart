@@ -19,6 +19,7 @@ class UploadScreen extends StatefulWidget {
 class _UploadScreenState extends State<UploadScreen> {
   final DocumentController _controller = ServiceLocator.instance.documents;
   final _nameController = TextEditingController();
+  final _noteController = TextEditingController();
   DocumentCategory? _selectedCategory;
   bool _isExpirable = true;
   DateTime? _expiryDate;
@@ -29,6 +30,7 @@ class _UploadScreenState extends State<UploadScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -95,6 +97,15 @@ class _UploadScreenState extends State<UploadScreen> {
                 setState(() => _expiryDate = DateTime.tryParse(value));
               },
             ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _noteController,
+              decoration: const InputDecoration(
+                labelText: 'Notes (optional)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
             const SizedBox(height: 24),
             FilledButton(
               onPressed: _chooseFile,
@@ -140,6 +151,9 @@ class _UploadScreenState extends State<UploadScreen> {
       isExpirable: _isExpirable,
       expiryDate: _isExpirable ? _expiryDate : null,
       filePath: _filePath!,
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
     );
     if (!mounted) return;
     setState(() => _isSaving = false);
