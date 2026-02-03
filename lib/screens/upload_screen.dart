@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/constants.dart';
+
 class UploadScreen extends StatelessWidget {
   const UploadScreen({super.key});
 
@@ -24,13 +26,12 @@ class UploadScreen extends StatelessWidget {
               labelText: 'Category',
               border: OutlineInputBorder(),
             ),
-            items: const [
-              DropdownMenuItem(value: 'ID', child: Text('ID')),
-              DropdownMenuItem(value: 'Certificate', child: Text('Certificate')),
-              DropdownMenuItem(value: 'License', child: Text('License')),
-              DropdownMenuItem(value: 'Property', child: Text('Property')),
-              DropdownMenuItem(value: 'Other', child: Text('Other')),
-            ],
+            items: documentCategories
+                .map((category) => DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    ))
+                .toList(),
             onChanged: (_) {},
           ),
           const SizedBox(height: 16),
