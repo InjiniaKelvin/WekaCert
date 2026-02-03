@@ -102,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           keyboardType: TextInputType.number,
           obscureText: true,
           decoration: InputDecoration(
-            hintText: 'Enter PIN (${pinLength}+ digits)',
+            hintText: 'Enter PIN (at least $pinLength digits)',
           ),
         ),
         actions: [
@@ -112,10 +112,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TextButton(
             onPressed: () {
-              if (controller.text.length < pinLength) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                if (controller.text.length < pinLength) {
+                  ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('PIN must be $pinLength+ digits.'),
+                    content: Text(
+                      'PIN must be at least $pinLength digits.',
+                    ),
                   ),
                 );
                 return;
