@@ -32,8 +32,15 @@ class DocumentVersion {
       documentId: map['documentId'] as String,
       filePath: map['filePath'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
+      updatedAt: DateTime.parse(_normalizeTimestamp(map['updatedAt'] as String)),
       note: map['note'] as String?,
     );
+  }
+
+  static String _normalizeTimestamp(String raw) {
+    if (raw.contains('T')) {
+      return raw;
+    }
+    return raw.replaceFirst(' ', 'T');
   }
 }

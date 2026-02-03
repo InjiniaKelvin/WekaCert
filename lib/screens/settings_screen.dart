@@ -151,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: const Text(
           'Cloud backups will encrypt documents before uploading. '
           'Sign-in integration is pending; this feature will be enabled when '
-          'cloud setup is complete.',
+          'cloud setup is completed.',
         ),
         actions: [
           TextButton(
