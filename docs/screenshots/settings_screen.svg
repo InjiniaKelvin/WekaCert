@@ -12,5 +12,5 @@
   <text x="32" y="450" font-size="20" fill="#222222" font-family="Arial, sans-serif">Cloud Backup</text>
   <rect x="32" y="480" width="656" height="90" rx="16" fill="#FFFFFF" />
   <text x="64" y="530" font-size="16" fill="#222222" font-family="Arial, sans-serif">Connect Google Drive</text>
-  <text x="64" y="555" font-size="14" fill="#666666" font-family="Arial, sans-serif">Encrypted backups</text>
+  <text x="64" y="555" font-size="14" fill="#666666" font-family="Arial, sans-serif">Encrypted backups are stored privately.</text>
 </svg>

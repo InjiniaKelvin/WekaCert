@@ -5,8 +5,6 @@ class BackupConflictResolver {
     required DocumentVersion local,
     required DocumentVersion remote,
   }) {
-    final localTime = local.updatedAt ?? local.createdAt;
-    final remoteTime = remote.updatedAt ?? remote.createdAt;
-    return localTime.isAfter(remoteTime) ? local : remote;
+    return local.updatedAt.isAfter(remote.updatedAt) ? local : remote;
   }
 }
