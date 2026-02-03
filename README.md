@@ -1,7 +1,7 @@
 # WekaCert
 
 ## Overview
-Personal Document & Certificate Tracker is a mobile app concept for Kenyan citizens to securely store and manage personal documents (IDs, certificates, licenses, property papers, and more). It provides an encrypted local vault for PDFs/images/scans, supports expirable and permanent documents, and enables fast offline access.
+WekaCert (Personal Document & Certificate Tracker) is a mobile app concept for Kenyan citizens to securely store and manage personal documents (IDs, certificates, licenses, property papers, and more). It provides an encrypted local vault for PDFs/images/scans, supports expirable and permanent documents, and enables fast offline access.
 
 ## Key Features
 - Secure document upload and encrypted local storage
