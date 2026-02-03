@@ -88,6 +88,7 @@ export class DocumentsController {
     }
     if (!this.storage.isOwnedObjectKey(req.user.id, objectKey)) {
       this.logger.warn('Object key access denied', {
+        // Sanitize in case auth providers use non-UUID identifiers.
         userId: req.user.id.replace(/[^\w-]/g, ''),
       });
       throw new NotFoundException('Document not found');
