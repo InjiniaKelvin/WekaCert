@@ -87,7 +87,9 @@ export class DocumentsController {
       throw new NotFoundException('Document not found');
     }
     if (!this.storage.isOwnedObjectKey(req.user.id, objectKey)) {
-      this.logger.warn(`Object key access denied for user ${req.user.id}`);
+      this.logger.warn('Object key access denied', {
+        userId: req.user.id.replace(/[^\w-]/g, ''),
+      });
       throw new NotFoundException('Document not found');
     }
     const version = await this.documents.getVersionForDocument(id, objectKey);
