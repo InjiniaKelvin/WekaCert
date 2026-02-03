@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
 import '../models/backup_record.dart';
@@ -9,7 +10,7 @@ import '../utils/date_utils.dart';
 
 class CloudBackupService {
   CloudBackupService({required String encryptionKey})
-      : _key = Key.fromUtf8(_normalizeKey(encryptionKey));
+      : _key = Key(_deriveKey(encryptionKey));
 
   final Key _key;
 
@@ -50,9 +51,10 @@ class CloudBackupService {
     return file;
   }
 
-  static String _normalizeKey(String key) {
-    final normalized = key.padRight(32, '0');
-    return normalized.substring(0, 32);
+  static List<int> _deriveKey(String key) {
+    final bytes = utf8.encode(key);
+    final digest = sha256.convert(bytes);
+    return digest.bytes;
   }
 
   String buildBackupLabel(DateTime timestamp) {

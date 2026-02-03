@@ -5,9 +5,9 @@ class BackupConflictResolver {
     required DocumentVersion local,
     required DocumentVersion remote,
   }) {
-    if (remote.createdAt.isAfter(local.createdAt)) {
-      return remote;
+    if (local.createdAt.isAfter(remote.createdAt)) {
+      return local;
     }
-    return local;
+    return remote;
   }
 }

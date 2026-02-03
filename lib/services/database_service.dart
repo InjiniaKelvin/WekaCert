@@ -88,9 +88,9 @@ class DatabaseService {
 
   Future<void> deleteDocument(String documentId) async {
     final db = await database;
-    await db.delete('document_versions',
-        where: 'documentId = ?', whereArgs: [documentId]);
     await db.delete('backup_records',
+        where: 'documentId = ?', whereArgs: [documentId]);
+    await db.delete('document_versions',
         where: 'documentId = ?', whereArgs: [documentId]);
     await db.delete('documents', where: 'id = ?', whereArgs: [documentId]);
   }
