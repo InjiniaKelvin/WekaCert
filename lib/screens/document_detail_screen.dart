@@ -17,6 +17,7 @@ class DocumentDetailScreen extends StatefulWidget {
 
 class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
   final DocumentController _controller = ServiceLocator.instance.documents;
+  bool _isRestoring = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +65,21 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                   if (data.document.expiryDate != null)
                     Text('Expiry: ${formatDate(data.document.expiryDate!)}'),
                   const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: _isRestoring
+                        ? null
+                        : () => _restoreBackup(data.document.id),
+                    child: Text(
+                      _isRestoring ? 'Restoring...' : 'Restore from Backup',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   if (data.versions.isNotEmpty)
                     Card(
                       child: ListTile(
                         title: const Text('Latest Version'),
                         subtitle: Text(
-                          'Uploaded: ${formatDate(data.versions.first.createdAt)}',
+                          'Uploaded: ${formatDate(data.versions.first.updatedAt)}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.download),
@@ -97,6 +107,19 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _restoreBackup(String documentId) async {
+    setState(() => _isRestoring = true);
+    final document = await _controller.fetchDocument(documentId);
+    if (document != null) {
+      await _controller.restoreLatestBackup(document.document);
+    }
+    if (!mounted) return;
+    setState(() => _isRestoring = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Backup restore complete.')),
     );
   }
 }

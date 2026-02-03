@@ -1,8 +1,9 @@
 import 'dart:async';
-
-import 'package:uuid/uuid.dart';
-
 import 'dart:io';
+
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/backup_record.dart';
 import '../models/document.dart';
@@ -77,33 +78,17 @@ class DocumentController {
     required String filePath,
     String? note,
   }) async {
+    final now = DateTime.now();
     final version = DocumentVersion(
       id: _uuid.v4(),
       documentId: document.id,
       filePath: filePath,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
       note: note,
     );
     await _repository.addVersion(version);
     await loadDocuments();
-  }
-
-  Future<BackupRecord?> backupVersion(DocumentVersion version) async {
-    if (_backup == null) {
-      return null;
-    }
-    final file = File(version.filePath);
-    if (!file.existsSync()) {
-      return null;
-    }
-    final record = await _backup!.encryptAndStore(version: version, file: file);
-    await _repository.upsertBackupRecord(record);
-    return record;
-  }
-
-  Future<List<BackupRecord>> fetchBackupRecords() async {
-    return _repository.fetchBackupRecords();
   }
 
   Future<void> updateDocument(Document document) async {
@@ -148,6 +133,51 @@ class DocumentController {
           matchesExpirable &&
           matchesStatus;
     }).toList();
+  }
+
+  Future<BackupRecord?> backupVersion(DocumentVersion version) async {
+    if (_backup == null) {
+      return null;
+    }
+    final file = File(version.filePath);
+    if (!file.existsSync()) {
+      return null;
+    }
+    final record = await _backup!.encryptAndStore(version: version, file: file);
+    await _repository.upsertBackupRecord(record);
+    return record;
+  }
+
+  Future<bool> restoreLatestBackup(Document document) async {
+    if (_backup == null) {
+      return false;
+    }
+    final records = await _repository.fetchBackupRecords();
+    final candidates = records
+        .where((record) => record.documentId == document.id)
+        .toList();
+    if (candidates.isEmpty) {
+      return false;
+    }
+    candidates.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final record = candidates.first;
+    final directory = await getApplicationDocumentsDirectory();
+    final filename = 'restored_${record.versionId}.bin';
+    final targetPath = path.join(directory.path, filename);
+    final restored = await _backup!.restoreFromBackup(
+      payloadPath: record.cloudPath,
+      targetPath: targetPath,
+    );
+    await addVersion(
+      document: document,
+      filePath: restored.path,
+      note: 'Restored from backup',
+    );
+    return true;
+  }
+
+  Future<List<BackupRecord>> fetchBackupRecords() async {
+    return _repository.fetchBackupRecords();
   }
 
   Future<void> _scheduleReminder(Document document) async {

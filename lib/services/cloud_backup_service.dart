@@ -3,10 +3,15 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import '../models/backup_record.dart';
 import '../models/document_version.dart';
 
+/// Encrypts document bytes for cloud backup using AES with a random IV.
+/// Produces a base64 payload ready for upload to providers like Google Drive.
+/// Replace the placeholder cloud path with real remote storage identifiers.
 class CloudBackupService {
   CloudBackupService({required String encryptionKey})
       : _key = Key(_deriveKey(encryptionKey));
@@ -25,15 +30,23 @@ class CloudBackupService {
       'iv': iv.base64,
       'data': encrypted.base64,
     });
-    // TODO: upload payload to cloud provider.
-    final cloudPath = 'cloud://${version.documentId}/${version.id}.enc';
+    final backupFile = await _createBackupFile(version);
+    await backupFile.writeAsString(payload, flush: true);
     return BackupRecord(
       id: '${version.documentId}-${version.id}',
       documentId: version.documentId,
       versionId: version.id,
-      cloudPath: cloudPath,
+      cloudPath: backupFile.path,
       updatedAt: DateTime.now(),
     );
+  }
+
+  Future<File> restoreFromBackup({
+    required String payloadPath,
+    required String targetPath,
+  }) async {
+    final payload = await File(payloadPath).readAsString();
+    return decryptFromPayload(payload: payload, targetPath: targetPath);
   }
 
   Future<File> decryptFromPayload({
@@ -50,10 +63,19 @@ class CloudBackupService {
     return file;
   }
 
+  Future<File> _createBackupFile(DocumentVersion version) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final backupDir = Directory(path.join(directory.path, 'backups'));
+    if (!backupDir.existsSync()) {
+      await backupDir.create(recursive: true);
+    }
+    final filename = '${version.documentId}-${version.id}.enc';
+    return File(path.join(backupDir.path, filename));
+  }
+
   static List<int> _deriveKey(String key) {
     final bytes = utf8.encode(key);
     final digest = sha256.convert(bytes);
     return digest.bytes;
   }
-
 }
