@@ -66,9 +66,18 @@ class _PinScreenState extends State<PinScreen> {
     final success = await _auth.verifyPin(pin);
     if (!success) {
       _attempts += 1;
-      setState(() => _error = 'Incorrect PIN. Attempts: $_attempts');
       if (_attempts >= 5) {
         await _preferences.setPinEnabled(false);
+        if (mounted) {
+          setState(() {
+            _error =
+                'PIN disabled after too many failed attempts. Re-enable in Settings.';
+          });
+        }
+        return;
+      }
+      if (mounted) {
+        setState(() => _error = 'Incorrect PIN. Attempts: $_attempts');
       }
       return;
     }

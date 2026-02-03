@@ -15,6 +15,7 @@ dependencies:
   path_provider: ^2.1.2
   shared_preferences: ^2.2.2
   crypto: ^3.0.3
+  file_picker: ^6.1.1
   sqflite_sqlcipher: ^2.2.1
   timezone: ^0.9.2
   uuid: ^4.3.3
@@ -24,6 +25,7 @@ dev_dependencies:
     sdk: flutter
 
 dependency_overrides:
+  # Needed to resolve compatible meta constraints for Flutter packages.
   meta: ^1.11.0
 
 flutter:

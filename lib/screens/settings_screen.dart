@@ -57,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (pin == null) return;
                 await _auth.setPin(pin);
               } else {
-                await _preferences.setPinEnabled(false);
+                await _preferences.clearPin();
               }
               if (!mounted) return;
               setState(() => _pinEnabled = value);
@@ -81,36 +81,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _selectReminderDays(BuildContext context) async {
-    var selectedDays = _reminderDays;
     final newValue = await showDialog<int>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reminder days'),
-        content: DropdownButtonFormField<int>(
-          value: _reminderDays,
-          items: reminderDayOptions
-              .map(
-                (value) => DropdownMenuItem(
-                  value: value,
-                  child: Text('$value days'),
-                ),
-              )
-              .toList(),
-          onChanged: (value) {
-            selectedDays = value ?? selectedDays;
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, selectedDays),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (context) => _ReminderDaysDialog(initialValue: _reminderDays),
     );
     if (newValue == null) return;
     await _preferences.setReminderDays(newValue);
@@ -128,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: controller,
           keyboardType: TextInputType.number,
           obscureText: true,
-          decoration: const InputDecoration(hintText: '4-digit PIN'),
+          decoration: const InputDecoration(hintText: 'Enter PIN (4+ digits)'),
         ),
         actions: [
           TextButton(
@@ -136,11 +109,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
+            onPressed: () {
+              if (controller.text.length < 4) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PIN must be 4+ digits.')),
+                );
+                return;
+              }
+              Navigator.pop(context, controller.text);
+            },
             child: const Text('Save'),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ReminderDaysDialog extends StatefulWidget {
+  const _ReminderDaysDialog({required this.initialValue});
+
+  final int initialValue;
+
+  @override
+  State<_ReminderDaysDialog> createState() => _ReminderDaysDialogState();
+}
+
+class _ReminderDaysDialogState extends State<_ReminderDaysDialog> {
+  late int _selectedDays;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDays = widget.initialValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Reminder days'),
+      content: DropdownButtonFormField<int>(
+        value: _selectedDays,
+        items: reminderDayOptions
+            .map(
+              (value) => DropdownMenuItem(
+                value: value,
+                child: Text('$value days'),
+              ),
+            )
+            .toList(),
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() => _selectedDays = value);
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _selectedDays),
+          child: const Text('Save'),
+        ),
+      ],
     );
   }
 }

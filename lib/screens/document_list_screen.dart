@@ -198,7 +198,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ],
             onChanged: (value) => setState(() {
-              _filter = _filter.copyWith(category: value);
+              _filter = _filter.copyWith(
+                category: value,
+                clearCategory: value == null,
+              );
             }),
           ),
           const SizedBox(height: 12),
@@ -228,7 +231,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ],
             onChanged: (value) => setState(() {
-              _filter = _filter.copyWith(expiryStatus: value);
+              _filter = _filter.copyWith(
+                expiryStatus: value,
+                clearExpiryStatus: value == null,
+              );
             }),
           ),
           const SizedBox(height: 12),
@@ -244,7 +250,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               DropdownMenuItem(value: false, child: Text('Permanent')),
             ],
             onChanged: (value) => setState(() {
-              _filter = _filter.copyWith(isExpirable: value);
+              _filter = _filter.copyWith(
+                isExpirable: value,
+                clearIsExpirable: value == null,
+              );
             }),
           ),
           const SizedBox(height: 16),

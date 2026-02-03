@@ -135,11 +135,4 @@ class DatabaseService {
     }
     _database = null;
   }
-
-  DocumentCategory parseCategory(String raw) {
-    return DocumentCategory.values.firstWhere(
-      (category) => category.name == raw,
-      orElse: () => DocumentCategory.other,
-    );
-  }
 }

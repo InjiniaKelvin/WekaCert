@@ -62,18 +62,14 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                   const SizedBox(height: 8),
                   DocumentStatusBadge(status: status),
                   if (data.document.expiryDate != null)
-                    Text(
-                      'Expiry: ${data.document.expiryDate!.toLocal()}'
-                          .split(' ')[0],
-                    ),
+                    Text('Expiry: ${formatDate(data.document.expiryDate!)}'),
                   const SizedBox(height: 16),
                   if (data.versions.isNotEmpty)
                     Card(
                       child: ListTile(
                         title: const Text('Latest Version'),
                         subtitle: Text(
-                          'Uploaded: ${data.versions.first.createdAt.toLocal()}'
-                              .split(' ')[0],
+                          'Uploaded: ${formatDate(data.versions.first.createdAt)}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.download),

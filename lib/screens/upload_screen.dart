@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/document_category.dart';
+import 'package:file_picker/file_picker.dart';
+
 import '../services/document_controller.dart';
 import '../services/service_locator.dart';
 import '../utils/constants.dart';
@@ -109,11 +111,16 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
-  void _chooseFile() {
-    setState(() => _filePath = '/storage/emulated/0/Documents/sample.pdf');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('File selected (sample placeholder).')),
+  Future<void> _chooseFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      withData: false,
     );
+    final path = result?.files.single.path;
+    if (path == null) {
+      return;
+    }
+    setState(() => _filePath = path);
   }
 
   Future<void> _saveDocument() async {

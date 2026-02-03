@@ -18,14 +18,17 @@ class DocumentFilter {
   DocumentFilter copyWith({
     String? searchQuery,
     DocumentCategory? category,
+    bool clearCategory = false,
     ExpiryStatus? expiryStatus,
+    bool clearExpiryStatus = false,
     bool? isExpirable,
+    bool clearIsExpirable = false,
   }) {
     return DocumentFilter(
       searchQuery: searchQuery ?? this.searchQuery,
-      category: category ?? this.category,
-      expiryStatus: expiryStatus ?? this.expiryStatus,
-      isExpirable: isExpirable ?? this.isExpirable,
+      category: clearCategory ? null : category ?? this.category,
+      expiryStatus: clearExpiryStatus ? null : expiryStatus ?? this.expiryStatus,
+      isExpirable: clearIsExpirable ? null : isExpirable ?? this.isExpirable,
     );
   }
 }

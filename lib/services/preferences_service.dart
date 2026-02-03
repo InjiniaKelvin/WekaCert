@@ -34,4 +34,10 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_pinHashKey, hash);
   }
+
+  Future<void> clearPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_pinHashKey);
+    await prefs.setBool(_pinEnabledKey, false);
+  }
 }
