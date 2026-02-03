@@ -39,14 +39,26 @@ export class DocumentsController {
 
   @Post(':id/versions')
   async addVersion(
+    @Req() req: { user: { id: string } },
     @Param('id') id: string,
     @Body() dto: CreateDocumentVersionDto,
   ) {
+    const document = await this.documents.getDocumentForOwner(id, req.user.id);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
     return this.documents.addVersion(id, dto.objectKey, dto.note ?? null);
   }
 
   @Get(':id/versions')
-  listVersions(@Param('id') id: string) {
+  async listVersions(
+    @Req() req: { user: { id: string } },
+    @Param('id') id: string,
+  ) {
+    const document = await this.documents.getDocumentForOwner(id, req.user.id);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
     return this.documents.listVersions(id);
   }
 
