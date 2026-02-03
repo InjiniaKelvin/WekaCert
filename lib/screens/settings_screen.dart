@@ -75,6 +75,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _selectReminderDays(context),
           ),
+          const SizedBox(height: 16),
+          const Text(
+            'Cloud Backup (Optional)',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            title: const Text('Connect Google Drive'),
+            subtitle: const Text('Encrypted backups are stored privately.'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showBackupInfo(context),
+          ),
         ],
       ),
     );
@@ -125,6 +137,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(context, controller.text);
             },
             child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showBackupInfo(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cloud Backup'),
+        content: const Text(
+          'Cloud backups will encrypt documents before uploading. '
+          'Sign-in integration is pending; enable when cloud setup is complete.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
           ),
         ],
       ),

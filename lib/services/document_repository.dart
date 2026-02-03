@@ -1,3 +1,4 @@
+import '../models/backup_record.dart';
 import '../models/document.dart';
 import '../models/document_version.dart';
 import '../models/document_with_versions.dart';
@@ -31,5 +32,13 @@ class DocumentRepository {
 
   Future<DocumentWithVersions?> fetchDocument(String documentId) async {
     return _database.fetchDocumentWithVersions(documentId);
+  }
+
+  Future<void> upsertBackupRecord(BackupRecord record) async {
+    await _database.upsertBackupRecord(record);
+  }
+
+  Future<List<BackupRecord>> fetchBackupRecords() async {
+    return _database.fetchBackupRecords();
   }
 }

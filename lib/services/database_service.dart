@@ -4,8 +4,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
+import '../models/backup_record.dart';
 import '../models/document.dart';
-import '../models/document_category.dart';
 import '../models/document_version.dart';
 import '../models/document_with_versions.dart';
 
@@ -51,6 +51,17 @@ class DatabaseService {
             FOREIGN KEY(documentId) REFERENCES documents(id)
           )
         ''');
+        await db.execute('''
+          CREATE TABLE backup_records (
+            id TEXT PRIMARY KEY,
+            documentId TEXT NOT NULL,
+            versionId TEXT NOT NULL,
+            cloudPath TEXT NOT NULL,
+            updatedAt TEXT NOT NULL,
+            FOREIGN KEY(documentId) REFERENCES documents(id),
+            FOREIGN KEY(versionId) REFERENCES document_versions(id)
+          )
+        ''');
       },
     );
   }
@@ -78,6 +89,8 @@ class DatabaseService {
   Future<void> deleteDocument(String documentId) async {
     final db = await database;
     await db.delete('document_versions',
+        where: 'documentId = ?', whereArgs: [documentId]);
+    await db.delete('backup_records',
         where: 'documentId = ?', whereArgs: [documentId]);
     await db.delete('documents', where: 'id = ?', whereArgs: [documentId]);
   }
@@ -126,6 +139,21 @@ class DatabaseService {
       ));
     }
     return result;
+  }
+
+  Future<void> upsertBackupRecord(BackupRecord record) async {
+    final db = await database;
+    await db.insert(
+      'backup_records',
+      record.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<BackupRecord>> fetchBackupRecords() async {
+    final db = await database;
+    final rows = await db.query('backup_records', orderBy: 'updatedAt DESC');
+    return rows.map(BackupRecord.fromMap).toList();
   }
 
   Future<void> close() async {

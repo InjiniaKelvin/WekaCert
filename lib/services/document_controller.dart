@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:uuid/uuid.dart';
 
+import 'dart:io';
+
+import '../models/backup_record.dart';
 import '../models/document.dart';
 import '../models/document_category.dart';
 import '../models/document_filter.dart';
 import '../models/document_version.dart';
 import '../models/document_with_versions.dart';
 import '../utils/date_utils.dart';
+import 'cloud_backup_service.dart';
 import 'document_repository.dart';
 import 'notification_service.dart';
 import 'preferences_service.dart';
@@ -17,13 +21,16 @@ class DocumentController {
     required DocumentRepository repository,
     required NotificationService notifications,
     required PreferencesService preferences,
+    CloudBackupService? backup,
   })  : _repository = repository,
         _notifications = notifications,
-        _preferences = preferences;
+        _preferences = preferences,
+        _backup = backup;
 
   final DocumentRepository _repository;
   final NotificationService _notifications;
   final PreferencesService _preferences;
+  final CloudBackupService? _backup;
   final _uuid = const Uuid();
 
   final _documents = StreamController<List<DocumentWithVersions>>.broadcast();
@@ -78,6 +85,23 @@ class DocumentController {
     );
     await _repository.addVersion(version);
     await loadDocuments();
+  }
+
+  Future<BackupRecord?> backupVersion(DocumentVersion version) async {
+    if (_backup == null) {
+      return null;
+    }
+    final file = File(version.filePath);
+    if (!file.existsSync()) {
+      return null;
+    }
+    final record = await _backup!.encryptAndStore(version: version, file: file);
+    await _repository.upsertBackupRecord(record);
+    return record;
+  }
+
+  Future<List<BackupRecord>> fetchBackupRecords() async {
+    return _repository.fetchBackupRecords();
   }
 
   Future<void> updateDocument(Document document) async {
