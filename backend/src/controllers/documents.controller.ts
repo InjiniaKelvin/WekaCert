@@ -83,6 +83,9 @@ export class DocumentsController {
     if (!document) {
       throw new NotFoundException('Document not found');
     }
+    if (!this.storage.isOwnedObjectKey(req.user.id, objectKey)) {
+      throw new NotFoundException('Document not found');
+    }
     const version = await this.documents.getVersionForDocument(id, objectKey);
     if (!version) {
       throw new NotFoundException('Version not found');

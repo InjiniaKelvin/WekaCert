@@ -37,4 +37,8 @@ export class StorageService {
   buildObjectKey(ownerId: string, documentId: string) {
     return `${ownerId}/${documentId}/${randomUUID()}.enc`;
   }
+
+  isOwnedObjectKey(ownerId: string, objectKey: string) {
+    return objectKey.startsWith(`${ownerId}/`);
+  }
 }
