@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { Client } from 'minio';
 
 @Injectable()
@@ -34,7 +35,6 @@ export class StorageService {
   }
 
   buildObjectKey(ownerId: string, documentId: string) {
-    const timestamp = Date.now();
-    return `${ownerId}/${documentId}/${timestamp}.enc`;
+    return `${ownerId}/${documentId}/${randomUUID()}.enc`;
   }
 }

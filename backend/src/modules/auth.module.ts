@@ -8,12 +8,17 @@ import { UserEntity } from '../entities/user.entity';
 import { JwtStrategy } from '../guards/jwt.strategy';
 import { AuthService } from '../services/auth.service';
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error('JWT_SECRET is required');
+}
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'change_me',
+      secret: jwtSecret,
       signOptions: { expiresIn: '7d' },
     }),
   ],

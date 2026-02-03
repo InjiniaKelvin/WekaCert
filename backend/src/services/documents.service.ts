@@ -42,4 +42,8 @@ export class DocumentsService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  async getDocumentForOwner(documentId: string, ownerId: string) {
+    return this.documents.findOne({ where: { id: documentId, ownerId } });
+  }
 }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Post,
   Req,
@@ -57,7 +58,15 @@ export class DocumentsController {
   }
 
   @Get(':id/download-url/:objectKey')
-  async downloadUrl(@Param('objectKey') objectKey: string) {
+  async downloadUrl(
+    @Req() req: { user: { id: string } },
+    @Param('id') id: string,
+    @Param('objectKey') objectKey: string,
+  ) {
+    const document = await this.documents.getDocumentForOwner(id, req.user.id);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
     const url = await this.storage.getPresignedGetUrl(objectKey);
     return { url };
   }

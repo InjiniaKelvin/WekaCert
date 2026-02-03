@@ -14,7 +14,7 @@ import { UsersModule } from './users.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/../entities/*.entity.{ts,js}'],
-      synchronize: false,
+      synchronize: false, // Use migrations in production.
     }),
     AuthModule,
     UsersModule,
