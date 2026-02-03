@@ -38,9 +38,14 @@ class DocumentVersion {
   }
 
   static String _normalizeTimestamp(String raw) {
-    if (raw.contains('T')) {
-      return raw;
+    var normalized = raw.contains('T') ? raw : raw.replaceFirst(' ', 'T');
+    if (DateTime.tryParse(normalized) != null) {
+      return normalized;
     }
-    return raw.replaceFirst(' ', 'T');
+    if (normalized.contains('.')) {
+      final trimmed = normalized.split('.').first;
+      return trimmed;
+    }
+    return normalized;
   }
 }

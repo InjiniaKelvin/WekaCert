@@ -48,7 +48,7 @@ class DatabaseService {
             filePath TEXT NOT NULL,
             createdAt TEXT NOT NULL,
             updatedAt TEXT NOT NULL
-              DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')),
+              DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
             note TEXT,
             FOREIGN KEY(documentId) REFERENCES documents(id)
           )
