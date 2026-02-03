@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -17,6 +18,8 @@ import { StorageService } from '../services/storage.service';
 @Controller('documents')
 @UseGuards(JwtAuthGuard)
 export class DocumentsController {
+  private readonly logger = new Logger(DocumentsController.name);
+
   constructor(
     private readonly documents: DocumentsService,
     private readonly storage: StorageService,
@@ -84,6 +87,7 @@ export class DocumentsController {
       throw new NotFoundException('Document not found');
     }
     if (!this.storage.isOwnedObjectKey(req.user.id, objectKey)) {
+      this.logger.warn(`Object key access denied for user ${req.user.id}`);
       throw new NotFoundException('Document not found');
     }
     const version = await this.documents.getVersionForDocument(id, objectKey);
