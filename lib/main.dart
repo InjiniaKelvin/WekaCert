@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'screens/document_detail_screen.dart';
 import 'screens/document_list_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/pin_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/upload_screen.dart';
+import 'services/service_locator.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ServiceLocator.instance.initialize();
   runApp(const WekaCertApp());
 }
 
@@ -25,6 +29,7 @@ class WekaCertApp extends StatelessWidget {
         DocumentDetailScreen.routeName: (context) => const DocumentDetailScreen(),
         UploadScreen.routeName: (context) => const UploadScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
+        PinScreen.routeName: (context) => const PinScreen(),
       },
     );
   }

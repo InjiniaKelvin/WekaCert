@@ -1,5 +1,5 @@
 name: weka_cert
-version: 0.1.0+1
+version: 0.2.0+2
 publish_to: "none"
 
 environment:
@@ -8,6 +8,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_local_notifications: ^16.3.2
+  flutter_secure_storage: ^9.2.2
+  local_auth: ^2.2.0
+  path: ^1.9.0
+  path_provider: ^2.1.2
+  shared_preferences: ^2.2.2
+  crypto: ^3.0.3
+  sqflite_sqlcipher: ^2.2.1
+  timezone: ^0.9.2
+  uuid: ^4.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+dependency_overrides:
+  meta: ^1.11.0
 
 flutter:
   uses-material-design: true
