@@ -46,4 +46,8 @@ export class DocumentsService {
   async getDocumentForOwner(documentId: string, ownerId: string) {
     return this.documents.findOne({ where: { id: documentId, ownerId } });
   }
+
+  async getVersionForDocument(documentId: string, objectKey: string) {
+    return this.versions.findOne({ where: { documentId, objectKey } });
+  }
 }

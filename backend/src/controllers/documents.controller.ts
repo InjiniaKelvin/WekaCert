@@ -83,6 +83,10 @@ export class DocumentsController {
     if (!document) {
       throw new NotFoundException('Document not found');
     }
+    const version = await this.documents.getVersionForDocument(id, objectKey);
+    if (!version) {
+      throw new NotFoundException('Version not found');
+    }
     const url = await this.storage.getPresignedGetUrl(objectKey);
     return { url };
   }
