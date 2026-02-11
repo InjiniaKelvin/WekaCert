@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <rect width="900" height="500" fill="#F5F5F5" />
+  <rect x="60" y="60" width="220" height="80" rx="12" fill="#2E7D32" />
+  <text x="90" y="105" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Client Encrypts File</text>
+  <rect x="340" y="60" width="220" height="80" rx="12" fill="#1565C0" />
+  <text x="370" y="105" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Request Upload URL</text>
+  <rect x="620" y="60" width="220" height="80" rx="12" fill="#00897B" />
+  <text x="650" y="105" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Upload to MinIO</text>
+  <rect x="340" y="200" width="220" height="80" rx="12" fill="#1565C0" />
+  <text x="370" y="245" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Save Metadata</text>
+  <rect x="60" y="340" width="220" height="80" rx="12" fill="#2E7D32" />
+  <text x="90" y="385" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Request Download URL</text>
+  <rect x="340" y="340" width="220" height="80" rx="12" fill="#1565C0" />
+  <text x="360" y="385" font-size="16" fill="#FFFFFF" font-family="Arial, sans-serif">Download + Decrypt</text>
+  <line x1="280" y1="100" x2="340" y2="100" stroke="#333" stroke-width="2" />
+  <line x1="560" y1="100" x2="620" y2="100" stroke="#333" stroke-width="2" />
+  <line x1="450" y1="140" x2="450" y2="200" stroke="#333" stroke-width="2" />
+  <line x1="450" y1="280" x2="170" y2="340" stroke="#333" stroke-width="2" />
+  <line x1="280" y1="380" x2="340" y2="380" stroke="#333" stroke-width="2" />
+</svg>
