@@ -180,5 +180,26 @@ Enable Kenyan citizens to securely store, organize, and track their personal doc
 
 ---
 
-This document now contains a **complete requirements specification, Agile plan, backlog with tasks, and tech stack**, ready for **coding and senior project reporting**.
+## 7. Current Progress Snapshot & Prioritized Execution Checklist
 
+Current repository status (based on existing project files/branches): **planning complete, implementation not started**.
+
+To continue consistently across sessions, execute user stories in this order and only mark a story complete when all acceptance criteria are fully met.
+
+| Priority | Story ID | Scope | Status |
+|----------|----------|-------|--------|
+| P0 (Must) | US01 | Secure upload + encrypted local storage + retrieval | Not Started |
+| P0 (Must) | US08 | Full offline behavior for storage/retrieval/notifications | Not Started |
+| P0 (Must) | US06 | PIN + biometric access control | Not Started |
+| P1 (Should) | US02 | Document categorization | Not Started |
+| P1 (Should) | US03 | Expirable vs permanent document flow | Not Started |
+| P1 (Should) | US04 | Expiry reminders + threshold settings | Not Started |
+| P1 (Should) | US05 | Version history with timestamps + notes | Not Started |
+| P2 (Could) | US07 | Search and filtering | Not Started |
+| P3 (Optional) | US09 | Encrypted cloud backup + sync safeguards | Not Started |
+
+This checklist is the baseline handoff point for subsequent sessions so work can continue without leaving requirements partially done.
+
+---
+
+This document now contains a **complete requirements specification, Agile plan, backlog with tasks, tech stack, and a prioritized execution baseline**, ready for **coding and senior project reporting**.
