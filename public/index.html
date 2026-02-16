@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WekaCert</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>WekaCert</h1>
+
+      <section class="card" id="auth-card">
+        <h2>Access</h2>
+        <div class="row">
+          <input id="pin" type="password" placeholder="PIN (4-8 digits)" maxlength="8" />
+          <button id="setup-pin">Setup PIN</button>
+          <button id="login">Login</button>
+        </div>
+        <p id="auth-message"></p>
+      </section>
+
+      <section class="card hidden" id="upload-card">
+        <h2>Upload Document</h2>
+        <div class="grid">
+          <input id="doc-name" placeholder="Document name" />
+          <select id="doc-category">
+            <option value="ID">ID</option>
+            <option value="Certificate">Certificate</option>
+            <option value="License">License</option>
+            <option value="Property">Property</option>
+            <option value="Other">Other</option>
+          </select>
+          <label><input id="doc-permanent" type="checkbox" /> Permanent document</label>
+          <input id="doc-expiry" type="date" />
+          <input id="doc-notes" placeholder="Notes" />
+          <input id="doc-file" type="file" />
+        </div>
+        <button id="upload">Save Document</button>
+      </section>
+
+      <section class="card hidden" id="list-card">
+        <h2>Documents</h2>
+        <div class="row wrap">
+          <input id="search" placeholder="Search by name or category" />
+          <select id="status-filter">
+            <option value="">All statuses</option>
+            <option value="permanent">Permanent</option>
+            <option value="valid">Valid</option>
+            <option value="expired">Expired</option>
+            <option value="expiring">Expiring soon</option>
+          </select>
+          <button id="refresh">Refresh</button>
+        </div>
+        <ul id="doc-list"></ul>
+      </section>
+
+      <section class="card hidden" id="details-card">
+        <h2>Document Details</h2>
+        <pre id="doc-details"></pre>
+        <div class="grid">
+          <input id="ver-notes" placeholder="New version notes" />
+          <input id="ver-file" type="file" />
+          <button id="add-version">Add Version</button>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
