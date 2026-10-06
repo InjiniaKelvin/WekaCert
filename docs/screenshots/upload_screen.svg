@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+  <rect width="720" height="1280" fill="#F5F5F5" />
+  <rect width="720" height="96" fill="#1B5E20" />
+  <text x="32" y="60" font-size="28" fill="#FFFFFF" font-family="Arial, sans-serif">Upload Document</text>
+  <rect x="32" y="140" width="656" height="90" rx="12" fill="#FFFFFF" />
+  <text x="64" y="196" font-size="18" fill="#888888" font-family="Arial, sans-serif">Document Name</text>
+  <rect x="32" y="250" width="656" height="90" rx="12" fill="#FFFFFF" />
+  <text x="64" y="306" font-size="18" fill="#888888" font-family="Arial, sans-serif">Category</text>
+  <rect x="32" y="360" width="656" height="60" rx="30" fill="#FFFFFF" stroke="#2E7D32" stroke-width="2" />
+  <text x="64" y="399" font-size="16" fill="#2E7D32" font-family="Arial, sans-serif">This document expires</text>
+  <rect x="32" y="440" width="656" height="90" rx="12" fill="#FFFFFF" />
+  <text x="64" y="496" font-size="18" fill="#888888" font-family="Arial, sans-serif">Expiry Date</text>
+  <rect x="32" y="560" width="656" height="90" rx="12" fill="#FFFFFF" />
+  <text x="64" y="616" font-size="18" fill="#888888" font-family="Arial, sans-serif">Notes (optional)</text>
+  <rect x="32" y="680" width="656" height="68" rx="34" fill="#2E7D32" />
+  <text x="270" y="725" font-size="20" fill="#FFFFFF" font-family="Arial, sans-serif">Choose File</text>
+  <rect x="32" y="770" width="656" height="68" rx="34" fill="#2E7D32" />
+  <text x="270" y="815" font-size="20" fill="#FFFFFF" font-family="Arial, sans-serif">Save Document</text>
+</svg>
