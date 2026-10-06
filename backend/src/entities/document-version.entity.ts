@@ -22,7 +22,7 @@ export class DocumentVersionEntity {
   @Column()
   objectKey!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   note?: string | null;
 
   @CreateDateColumn({ type: 'timestamptz' })

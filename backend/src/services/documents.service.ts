@@ -50,4 +50,22 @@ export class DocumentsService {
   async getVersionForDocument(documentId: string, objectKey: string) {
     return this.versions.findOne({ where: { documentId, objectKey } });
   }
+
+  async getVersionById(versionId: string, documentId: string) {
+    return this.versions.findOne({ where: { id: versionId, documentId } });
+  }
+
+  async updateDocument(
+    documentId: string,
+    ownerId: string,
+    data: Partial<Pick<DocumentEntity, 'name' | 'category' | 'isExpirable' | 'expiryDate'>>,
+  ) {
+    await this.documents.update({ id: documentId, ownerId }, data as Partial<DocumentEntity>);
+    return this.documents.findOne({ where: { id: documentId, ownerId } });
+  }
+
+  async deleteDocument(documentId: string, ownerId: string) {
+    await this.versions.delete({ documentId });
+    await this.documents.delete({ id: documentId, ownerId });
+  }
 }

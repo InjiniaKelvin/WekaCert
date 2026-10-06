@@ -11,7 +11,7 @@ class DocumentStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       label: Text(labelForStatus(status)),
-      backgroundColor: _colorForStatus(status).withOpacity(0.15),
+      backgroundColor: _colorForStatus(status).withValues(alpha: 0.15),
       avatar: CircleAvatar(
         radius: 6,
         backgroundColor: _colorForStatus(status),
