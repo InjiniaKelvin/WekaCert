@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+  <rect width="720" height="1280" fill="#F5F5F5" />
+  <rect width="720" height="96" fill="#1B5E20" />
+  <text x="32" y="60" font-size="28" fill="#FFFFFF" font-family="Arial, sans-serif">Document Details</text>
+  <text x="32" y="140" font-size="24" fill="#222222" font-family="Arial, sans-serif">National ID</text>
+  <text x="32" y="180" font-size="18" fill="#666666" font-family="Arial, sans-serif">Category: ID</text>
+  <rect x="32" y="210" width="200" height="40" rx="20" fill="#E8F5E9" />
+  <circle cx="52" cy="230" r="8" fill="#2E7D32" />
+  <text x="70" y="237" font-size="16" fill="#2E7D32" font-family="Arial, sans-serif">Valid</text>
+  <rect x="32" y="270" width="656" height="100" rx="16" fill="#FFFFFF" />
+  <text x="64" y="315" font-size="18" fill="#222222" font-family="Arial, sans-serif">Latest Version</text>
+  <text x="64" y="345" font-size="14" fill="#666666" font-family="Arial, sans-serif">Uploaded: 2026-02-03</text>
+  <rect x="32" y="370" width="656" height="60" rx="30" fill="#2E7D32" />
+  <text x="240" y="410" font-size="18" fill="#FFFFFF" font-family="Arial, sans-serif">Restore from Backup</text>
+  <text x="32" y="470" font-size="18" fill="#222222" font-family="Arial, sans-serif">Version History</text>
+  <rect x="32" y="500" width="656" height="90" rx="16" fill="#FFFFFF" />
+  <text x="64" y="545" font-size="16" fill="#222222" font-family="Arial, sans-serif">Version 2</text>
+  <text x="64" y="570" font-size="14" fill="#666666" font-family="Arial, sans-serif">Note: Renewal uploaded</text>
+  <rect x="32" y="610" width="656" height="90" rx="16" fill="#FFFFFF" />
+  <text x="64" y="655" font-size="16" fill="#222222" font-family="Arial, sans-serif">Version 1</text>
+  <text x="64" y="680" font-size="14" fill="#666666" font-family="Arial, sans-serif">Note: Original document</text>
+</svg>

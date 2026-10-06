@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <rect width="900" height="500" fill="#F5F5F5" />
+  <rect x="40" y="40" width="260" height="120" rx="16" fill="#2E7D32" />
+  <text x="70" y="90" font-size="18" fill="#FFFFFF" font-family="Arial, sans-serif">Flutter Client</text>
+  <text x="70" y="120" font-size="14" fill="#FFFFFF" font-family="Arial, sans-serif">Encrypts files locally</text>
+  <rect x="340" y="40" width="260" height="120" rx="16" fill="#1565C0" />
+  <text x="370" y="90" font-size="18" fill="#FFFFFF" font-family="Arial, sans-serif">NestJS API</text>
+  <text x="370" y="120" font-size="14" fill="#FFFFFF" font-family="Arial, sans-serif">Auth + metadata</text>
+  <rect x="640" y="40" width="220" height="120" rx="16" fill="#6D4C41" />
+  <text x="670" y="90" font-size="18" fill="#FFFFFF" font-family="Arial, sans-serif">PostgreSQL</text>
+  <text x="670" y="120" font-size="14" fill="#FFFFFF" font-family="Arial, sans-serif">User + docs</text>
+  <rect x="340" y="220" width="260" height="120" rx="16" fill="#00897B" />
+  <text x="370" y="270" font-size="18" fill="#FFFFFF" font-family="Arial, sans-serif">MinIO</text>
+  <text x="370" y="300" font-size="14" fill="#FFFFFF" font-family="Arial, sans-serif">Encrypted blobs</text>
+  <line x1="300" y1="100" x2="340" y2="100" stroke="#333" stroke-width="2" />
+  <line x1="600" y1="100" x2="640" y2="100" stroke="#333" stroke-width="2" />
+  <line x1="470" y1="160" x2="470" y2="220" stroke="#333" stroke-width="2" />
+  <text x="110" y="180" font-size="12" fill="#333" font-family="Arial, sans-serif">JWT + metadata</text>
+  <text x="480" y="200" font-size="12" fill="#333" font-family="Arial, sans-serif">Pre-signed URLs</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+  <rect width="720" height="1280" fill="#F5F5F5" />
+  <rect width="720" height="96" fill="#1B5E20" />
+  <text x="32" y="60" font-size="28" fill="#FFFFFF" font-family="Arial, sans-serif">My Documents</text>
+  <rect x="32" y="130" width="656" height="70" rx="12" fill="#FFFFFF" />
+  <text x="64" y="175" font-size="18" fill="#888888" font-family="Arial, sans-serif">Search documents</text>
+  <rect x="32" y="230" width="656" height="120" rx="16" fill="#FFFFFF" />
+  <text x="64" y="275" font-size="20" fill="#222222" font-family="Arial, sans-serif">National ID</text>
+  <text x="64" y="305" font-size="16" fill="#666666" font-family="Arial, sans-serif">ID • Valid</text>
+  <circle cx="640" cy="280" r="12" fill="#2E7D32" />
+  <rect x="32" y="370" width="656" height="120" rx="16" fill="#FFFFFF" />
+  <text x="64" y="415" font-size="20" fill="#222222" font-family="Arial, sans-serif">Driver License</text>
+  <text x="64" y="445" font-size="16" fill="#666666" font-family="Arial, sans-serif">License • Expiring soon</text>
+  <circle cx="640" cy="420" r="12" fill="#F9A825" />
+  <rect x="32" y="510" width="656" height="120" rx="16" fill="#FFFFFF" />
+  <text x="64" y="555" font-size="20" fill="#222222" font-family="Arial, sans-serif">Land Title</text>
+  <text x="64" y="585" font-size="16" fill="#666666" font-family="Arial, sans-serif">Property • Permanent</text>
+  <circle cx="640" cy="560" r="12" fill="#1976D2" />
+</svg>
