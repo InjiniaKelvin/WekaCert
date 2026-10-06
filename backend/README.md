@@ -1,18 +1,18 @@
-# WekaCert Backend (NestJS + PostgreSQL + MinIO)
+# WekaCert Backend (NestJS + PostgreSQL + Encrypted MinIO Storage)
 
-This service provides first‑party cloud storage for encrypted document payloads.
-Client devices perform encryption locally; the backend only stores encrypted blobs
-and metadata.
+This service provides authenticated document and version management for WekaCert.
+Uploaded objects are encrypted with AES-256-GCM before MinIO storage; document
+metadata is persisted in PostgreSQL.
 
 ## Features
 - Email/password authentication (JWT)
 - Document metadata APIs
-- MinIO pre‑signed upload/download URLs for encrypted blobs
+- Multipart file upload and secure file serving
 - User profile endpoint
 
 ## Setup
 1. Copy `.env.example` to `.env` and fill in values.
-2. Start PostgreSQL and MinIO.
+2. Start PostgreSQL.
 3. Install dependencies:
    ```bash
    npm install
@@ -28,18 +28,23 @@ and metadata.
 - `GET /users/me` — current user profile
 - `GET /documents` — list user documents
 - `POST /documents` — create document
-- `POST /documents/:id/upload-url` — get MinIO upload URL
-- `POST /documents/:id/versions` — add encrypted version metadata
+- `GET /documents/:id` — get document details and versions
+- `PATCH /documents/:id` — update document metadata
+- `DELETE /documents/:id` — delete document and versions
+- `POST /documents/:id/upload` — upload a version file
+- `POST /documents/:id/versions/:versionId/backup` — upload an encrypted backup
+- `GET /documents/:id/versions/:versionId/backup` — restore an encrypted backup
 - `GET /documents/:id/versions` — list versions
-- `GET /documents/:id/download-url/:objectKey` — get download URL
+- `GET /documents/:id/versions/:versionId/file` — stream a stored file
 
-## Client-side encryption workflow
-1. Client encrypts file locally.
-2. Client requests `/documents/:id/upload-url`.
-3. Client uploads encrypted payload to MinIO via pre‑signed URL.
-4. Client calls `/documents/:id/versions` with objectKey + metadata.
+## File Handling
+1. The client uploads a file as multipart form data.
+2. The backend encrypts it in memory with `BACKUP_ENCRYPTION_KEY`.
+3. The encrypted object is stored in a private MinIO bucket.
+4. The backend records the object key in PostgreSQL.
+5. Authorized downloads decrypt in memory before responding.
 
 ## Security notes
-- Keep `JWT_SECRET` private.
+- Keep `JWT_SECRET` and `BACKUP_ENCRYPTION_KEY` private.
 - Use HTTPS in production.
-- Store only encrypted blobs in MinIO.
+- Keep the MinIO bucket private and restrict credentials to this service.

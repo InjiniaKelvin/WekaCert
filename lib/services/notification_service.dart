@@ -16,6 +16,19 @@ class NotificationService {
     const ios = DarwinInitializationSettings();
     const settings = InitializationSettings(android: android, iOS: ios);
     await _plugin.initialize(settings);
+
+    await _plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
+    await _plugin
+      .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(alert: true, badge: true, sound: true);
+    await _plugin
+      .resolvePlatformSpecificImplementation<
+        MacOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
   Future<void> scheduleExpiryReminder({
@@ -54,7 +67,7 @@ class NotificationService {
       '${document.name} expires on ${formatDate(document.expiryDate!)}',
       tz.TZDateTime.from(scheduledDate, tz.local),
       details,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );

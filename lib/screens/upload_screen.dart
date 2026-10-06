@@ -1,9 +1,9 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/document_category.dart';
-import 'package:file_picker/file_picker.dart';
-
-import '../services/document_controller.dart';
+import '../services/api_service.dart';
 import '../services/service_locator.dart';
 import '../utils/constants.dart';
 
@@ -17,15 +17,19 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  final DocumentController _controller = ServiceLocator.instance.documents;
   final _nameController = TextEditingController();
   final _noteController = TextEditingController();
   DocumentCategory? _selectedCategory;
   bool _isExpirable = true;
   DateTime? _expiryDate;
   bool _isSaving = false;
-  String? _filePath;
   final _formKey = GlobalKey<FormState>();
+
+  // Selected file (web-compatible — bytes only)
+  Uint8List? _selectedBytes;
+  String? _selectedFileName;
+  int? _selectedFileSize;
+  String? _selectedFilePath;
 
   @override
   void dispose() {
@@ -36,6 +40,7 @@ class _UploadScreenState extends State<UploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text('Upload Document')),
       body: Form(
@@ -43,6 +48,7 @@ class _UploadScreenState extends State<UploadScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // ── Document name ─────────────────────
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -53,51 +59,48 @@ class _UploadScreenState extends State<UploadScreen> {
                   value == null || value.trim().isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: 16),
+
+            // ── Category ──────────────────────────
             DropdownButtonFormField<DocumentCategory>(
               decoration: const InputDecoration(
                 labelText: 'Category',
                 border: OutlineInputBorder(),
               ),
               items: documentCategories
-                  .map((category) => DropdownMenuItem<DocumentCategory>(
-                        value: category,
-                        child: Text(category.label),
-                      ))
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c.label)))
                   .toList(),
-              value: _selectedCategory,
-              validator: (value) => value == null ? 'Required' : null,
-              onChanged: (value) => setState(() => _selectedCategory = value),
+              initialValue: _selectedCategory,
+              validator: (v) => v == null ? 'Required' : null,
+              onChanged: (v) => setState(() => _selectedCategory = v),
             ),
             const SizedBox(height: 16),
-          SwitchListTile(
-            title: const Text('This document expires'),
-            value: _isExpirable,
-            onChanged: (value) => setState(() {
-              _isExpirable = value;
-              if (!_isExpirable) {
-                _expiryDate = null;
-              }
-            }),
-          ),
-            const SizedBox(height: 8),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Expiry Date',
-                hintText: 'YYYY-MM-DD',
-                border: OutlineInputBorder(),
+
+            // ── Expiry toggle ─────────────────────
+            SwitchListTile(
+              title: const Text('This document expires'),
+              value: _isExpirable,
+              onChanged: (v) => setState(() {
+                _isExpirable = v;
+                if (!v) _expiryDate = null;
+              }),
+            ),
+            if (_isExpirable) ...[
+              const SizedBox(height: 8),
+              ListTile(
+                title: Text(_expiryDate == null
+                    ? 'Select Expiry Date'
+                    : 'Expiry: ${_expiryDate!.year}-${_expiryDate!.month.toString().padLeft(2, '0')}-${_expiryDate!.day.toString().padLeft(2, '0')}'),
+                trailing: const Icon(Icons.calendar_today),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: cs.outline),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                onTap: () => _pickExpiryDate(context),
               ),
-              validator: (value) {
-                if (!_isExpirable) return null;
-                if (value == null || value.trim().isEmpty) return 'Required';
-                return DateTime.tryParse(value) == null
-                    ? 'Use YYYY-MM-DD'
-                    : null;
-              },
-              onChanged: (value) {
-                setState(() => _expiryDate = DateTime.tryParse(value));
-              },
-            ),
+            ],
             const SizedBox(height: 16),
+
+            // ── Notes ─────────────────────────────
             TextFormField(
               controller: _noteController,
               decoration: const InputDecoration(
@@ -106,15 +109,40 @@ class _UploadScreenState extends State<UploadScreen> {
               ),
               maxLines: 3,
             ),
-            const SizedBox(height: 24),
-            FilledButton(
+            const SizedBox(height: 20),
+
+            // ── File picker ───────────────────────
+            OutlinedButton.icon(
               onPressed: _chooseFile,
-              child: Text(_filePath == null ? 'Choose File' : 'File Selected'),
+              icon: const Icon(Icons.attach_file),
+              label: Text(_selectedBytes == null
+                  ? 'Choose File (any type, max 50 MB)'
+                  : 'Change File'),
             ),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: _isSaving ? null : _saveDocument,
-              child: Text(_isSaving ? 'Saving...' : 'Save Document'),
+
+            // ── File preview ──────────────────────
+            if (_selectedBytes != null && _selectedFileName != null) ...[
+              const SizedBox(height: 12),
+              _FilePreviewCard(
+                fileName: _selectedFileName!,
+                fileSize: _selectedFileSize ?? _selectedBytes!.length,
+              ),
+            ],
+
+            const SizedBox(height: 24),
+
+            // ── Save ──────────────────────────────
+            FilledButton.icon(
+              onPressed: _isSaving
+                  ? null
+                  : (_selectedBytes != null ? _saveDocument : null),
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.save),
+              label: Text(_isSaving ? 'Uploading…' : 'Save Document'),
             ),
           ],
         ),
@@ -122,41 +150,189 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
+  Future<void> _pickExpiryDate(BuildContext context) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _expiryDate ?? now.add(const Duration(days: 365)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365 * 30)),
+    );
+    if (picked != null && mounted) setState(() => _expiryDate = picked);
+  }
+
   Future<void> _chooseFile() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
-      withData: false,
+      withData: kIsWeb,
     );
-    final path = result?.files.single.path;
-    if (path == null) {
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.single;
+
+    final bytes = file.bytes;
+    if (bytes != null && bytes.length > maxFileSizeBytes) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File exceeds 50 MB limit.')),
+        );
+      }
       return;
     }
-    setState(() => _filePath = path);
+    setState(() {
+      _selectedBytes = bytes;
+      _selectedFileName = file.name;
+      _selectedFileSize = file.size;
+      _selectedFilePath = file.path;
+    });
   }
 
   Future<void> _saveDocument() async {
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      return;
-    }
-    if (_filePath == null) {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_selectedBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please choose a file.')),
       );
       return;
     }
+    if (_isExpirable && _expiryDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an expiry date.')),
+      );
+      return;
+    }
+
     setState(() => _isSaving = true);
-    await _controller.addDocument(
-      name: _nameController.text.trim(),
-      category: _selectedCategory!,
-      isExpirable: _isExpirable,
-      expiryDate: _isExpirable ? _expiryDate : null,
-      filePath: _filePath!,
-      note: _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim(),
+    try {
+      final localController = ServiceLocator.instance.localVault;
+      final api = ServiceLocator.instance.api;
+
+      if (localController != null) {
+        await localController.addDocument(
+          name: _nameController.text.trim(),
+          category: _selectedCategory!,
+          isExpirable: _isExpirable,
+          expiryDate: _isExpirable ? _expiryDate : null,
+          fileBytes: _selectedBytes,
+          filePath: _selectedFilePath,
+          fileName: _selectedFileName!,
+          note: _noteController.text.trim().isEmpty
+              ? null
+              : _noteController.text.trim(),
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('${_nameController.text.trim()} saved locally!'),
+              backgroundColor: Colors.green),
+        );
+        Navigator.pop(context);
+        return;
+      }
+
+      // 1. Create document record
+      final doc = await api.createDocument(
+        name: _nameController.text.trim(),
+        category: _selectedCategory!.name,
+        isExpirable: _isExpirable,
+        expiryDate: _isExpirable ? _expiryDate : null,
+      );
+
+      // 2. Upload the file
+      await api.uploadFile(
+        doc.id,
+        _selectedBytes!,
+        _selectedFileName!,
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('${doc.name} saved successfully!'),
+            backgroundColor: Colors.green),
+      );
+      Navigator.pop(context);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Upload failed. Please try again.'),
+            backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+}
+// ── File preview card ────────────────────────────────────────────────────────
+
+class _FilePreviewCard extends StatelessWidget {
+  const _FilePreviewCard({required this.fileName, required this.fileSize});
+
+  final String fileName;
+  final int fileSize;
+
+  String get _formattedSize {
+    if (fileSize < 1024) return '$fileSize B';
+    if (fileSize < 1024 * 1024) {
+      return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  IconData get _icon {
+    final ext = fileName.split('.').last.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].contains(ext)) {
+      return Icons.image_outlined;
+    }
+    if (ext == 'pdf') return Icons.picture_as_pdf_outlined;
+    if (['doc', 'docx'].contains(ext)) return Icons.description_outlined;
+    if (['xls', 'xlsx', 'csv'].contains(ext)) {
+      return Icons.table_chart_outlined;
+    }
+    return Icons.insert_drive_file_outlined;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(_icon, size: 36, color: cs.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(fileName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(_formattedSize,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: cs.onSurfaceVariant)),
+              ],
+            ),
+          ),
+          Icon(Icons.check_circle, color: Colors.green.shade600),
+        ],
+      ),
     );
-    if (!mounted) return;
-    setState(() => _isSaving = false);
-    Navigator.pop(context);
   }
 }

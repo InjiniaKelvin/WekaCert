@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../models/document.dart';
+import '../models/document_category.dart';
 import '../models/document_filter.dart';
-import '../models/document_with_versions.dart';
-import '../services/document_controller.dart';
+import '../services/api_service.dart';
 import '../services/service_locator.dart';
-import '../utils/date_utils.dart';
 import '../utils/constants.dart';
+import '../utils/date_utils.dart';
 import '../widgets/document_status_badge.dart';
 import 'document_detail_screen.dart';
 
@@ -19,16 +20,18 @@ class DocumentListScreen extends StatefulWidget {
 }
 
 class _DocumentListScreenState extends State<DocumentListScreen> {
-  final DocumentController _controller = ServiceLocator.instance.documents;
   final _searchController = TextEditingController();
   DocumentFilter _filter = const DocumentFilter();
   int _reminderDays = 7;
+  List<Document> _documents = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _loadPreferences();
-    _controller.loadDocuments();
+    _loadDocuments();
   }
 
   Future<void> _loadPreferences() async {
@@ -37,14 +40,75 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     setState(() => _reminderDays = days);
   }
 
+  Future<void> _loadDocuments() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final localController = ServiceLocator.instance.localVault;
+      final docs = localController != null
+          ? (await localController.fetchDocuments())
+              .map((item) => item.document)
+              .toList()
+          : await ServiceLocator.instance.api.listDocuments();
+      if (!mounted) return;
+      setState(() {
+        _documents = docs;
+        _isLoading = false;
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.message;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Could not load documents.';
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
+  List<Document> get _filtered {
+    final q = _filter.searchQuery.toLowerCase();
+    return _documents.where((doc) {
+      if (q.isNotEmpty &&
+          !doc.name.toLowerCase().contains(q) &&
+          !doc.category.label.toLowerCase().contains(q)) {
+        return false;
+      }
+      if (_filter.category != null && doc.category != _filter.category) {
+        return false;
+      }
+      if (_filter.isExpirable != null &&
+          doc.isExpirable != _filter.isExpirable) {
+        return false;
+      }
+      if (_filter.expiryStatus != null) {
+        final status = statusForExpiry(
+          isExpirable: doc.isExpirable,
+          expiryDate: doc.expiryDate,
+          reminderDays: _reminderDays,
+        );
+        final filterStatus = toFilterStatus(status);
+        if (filterStatus != _filter.expiryStatus) return false;
+      }
+      return true;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final filtered = _filtered;
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Documents'),
@@ -55,60 +119,63 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<List<DocumentWithVersions>>(
-        stream: _controller.documentsStream,
-        builder: (context, snapshot) {
-          final docs = snapshot.data ?? [];
-          return FutureBuilder<List<DocumentWithVersions>>(
-            future: _controller.filterDocuments(docs, _filter, _reminderDays),
-            builder: (context, filteredSnapshot) {
-              final filteredDocs = filteredSnapshot.data ?? [];
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        labelText: 'Search documents',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: 'Search documents',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) =>
+                  setState(() => _filter = _filter.copyWith(searchQuery: value)),
+            ),
+          ),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_error!,
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error)),
+                            const SizedBox(height: 12),
+                            FilledButton(
+                                onPressed: _loadDocuments,
+                                child: const Text('Retry')),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadDocuments,
+                        child: filtered.isEmpty
+                            ? const Center(child: Text('No documents found.'))
+                            : ListView.builder(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                itemCount: filtered.length,
+                                itemBuilder: (context, index) {
+                                  final doc = filtered[index];
+                                  final status = statusForExpiry(
+                                    isExpirable: doc.isExpirable,
+                                    expiryDate: doc.expiryDate,
+                                    reminderDays: _reminderDays,
+                                  );
+                                  return DocumentListTile(
+                                    document: doc,
+                                    status: status,
+                                  );
+                                },
+                              ),
                       ),
-                      onChanged: (value) => setState(() {
-                        _filter = _filter.copyWith(searchQuery: value);
-                      }),
-                    ),
-                  ),
-                  Expanded(
-                    child: filteredSnapshot.connectionState ==
-                            ConnectionState.waiting
-                        ? const Center(child: CircularProgressIndicator())
-                        : filteredDocs.isEmpty
-                        ? const Center(
-                            child: Text('No documents found.'),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: filteredDocs.length,
-                            itemBuilder: (context, index) {
-                              final item = filteredDocs[index];
-                              final status = statusForExpiry(
-                                isExpirable: item.document.isExpirable,
-                                expiryDate: item.document.expiryDate,
-                                reminderDays: _reminderDays,
-                              );
-                              return DocumentListTile(
-                                document: item,
-                                status: status,
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -118,12 +185,9 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       context: context,
       builder: (_) => _FilterSheet(current: _filter),
     );
-    if (result != null) {
-      setState(() => _filter = result);
-    }
+    if (result != null) setState(() => _filter = result);
   }
 }
-
 class DocumentListTile extends StatelessWidget {
   const DocumentListTile({
     super.key,
@@ -131,30 +195,28 @@ class DocumentListTile extends StatelessWidget {
     required this.status,
   });
 
-  final DocumentWithVersions document;
+  final Document document;
   final ExpiryDisplayStatus status;
 
   @override
   Widget build(BuildContext context) {
     final subtitle =
-        '${document.document.category.label} • ${labelForStatus(status)}';
+        '${document.category.label} • ${labelForStatus(status)}';
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        title: Text(document.document.name),
+        title: Text(document.name),
         subtitle: Text(subtitle),
         trailing: DocumentStatusBadge(status: status),
         onTap: () => Navigator.pushNamed(
           context,
           DocumentDetailScreen.routeName,
-          arguments: document.document.id,
+          arguments: document.id,
         ),
       ),
     );
   }
-
 }
-
 class _FilterSheet extends StatefulWidget {
   const _FilterSheet({required this.current});
 
@@ -184,76 +246,50 @@ class _FilterSheetState extends State<_FilterSheet> {
           const SizedBox(height: 12),
           DropdownButtonFormField<DocumentCategory?>(
             decoration: const InputDecoration(labelText: 'Category'),
-            value: _filter.category,
+            initialValue: _filter.category,
             items: [
               const DropdownMenuItem<DocumentCategory?>(
-                value: null,
-                child: Text('All'),
-              ),
-              ...documentCategories.map(
-                (category) => DropdownMenuItem(
-                  value: category,
-                  child: Text(category.label),
-                ),
-              ),
+                  value: null, child: Text('All')),
+              ...documentCategories.map((c) =>
+                  DropdownMenuItem(value: c, child: Text(c.label))),
             ],
-            onChanged: (value) => setState(() {
+            onChanged: (v) => setState(() {
               _filter = _filter.copyWith(
-                category: value,
-                clearCategory: value == null,
-              );
+                  category: v, clearCategory: v == null);
             }),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<ExpiryStatus?>(
             decoration: const InputDecoration(labelText: 'Expiry status'),
-            value: _filter.expiryStatus,
+            initialValue: _filter.expiryStatus,
             items: const [
-              DropdownMenuItem<ExpiryStatus?>(
-                value: null,
-                child: Text('All'),
-              ),
+              DropdownMenuItem<ExpiryStatus?>(value: null, child: Text('All')),
+              DropdownMenuItem(value: ExpiryStatus.valid, child: Text('Valid')),
               DropdownMenuItem(
-                value: ExpiryStatus.valid,
-                child: Text('Valid'),
-              ),
+                  value: ExpiryStatus.expiringSoon,
+                  child: Text('Expiring soon')),
               DropdownMenuItem(
-                value: ExpiryStatus.expiringSoon,
-                child: Text('Expiring soon'),
-              ),
+                  value: ExpiryStatus.expired, child: Text('Expired')),
               DropdownMenuItem(
-                value: ExpiryStatus.expired,
-                child: Text('Expired'),
-              ),
-              DropdownMenuItem(
-                value: ExpiryStatus.permanent,
-                child: Text('Permanent'),
-              ),
+                  value: ExpiryStatus.permanent, child: Text('Permanent')),
             ],
-            onChanged: (value) => setState(() {
+            onChanged: (v) => setState(() {
               _filter = _filter.copyWith(
-                expiryStatus: value,
-                clearExpiryStatus: value == null,
-              );
+                  expiryStatus: v, clearExpiryStatus: v == null);
             }),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<bool?>(
             decoration: const InputDecoration(labelText: 'Type'),
-            value: _filter.isExpirable,
+            initialValue: _filter.isExpirable,
             items: const [
-              DropdownMenuItem<bool?>(
-                value: null,
-                child: Text('All'),
-              ),
+              DropdownMenuItem<bool?>(value: null, child: Text('All')),
               DropdownMenuItem(value: true, child: Text('Expirable')),
               DropdownMenuItem(value: false, child: Text('Permanent')),
             ],
-            onChanged: (value) => setState(() {
+            onChanged: (v) => setState(() {
               _filter = _filter.copyWith(
-                isExpirable: value,
-                clearIsExpirable: value == null,
-              );
+                  isExpirable: v, clearIsExpirable: v == null);
             }),
           ),
           const SizedBox(height: 16),

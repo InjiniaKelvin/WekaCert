@@ -52,10 +52,26 @@ class _PinScreenState extends State<PinScreen> {
               onPressed: _attemptUnlock,
               child: const Text('Unlock'),
             ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _unlockWithBiometrics,
+              icon: const Icon(Icons.fingerprint),
+              label: const Text('Use Biometrics'),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _unlockWithBiometrics() async {
+    final success = await _auth.authenticateWithBiometrics();
+    if (!mounted) return;
+    if (success) {
+      Navigator.pop(context, true);
+    } else {
+      setState(() => _error = 'Biometric authentication failed.');
+    }
   }
 
   Future<void> _attemptUnlock() async {
